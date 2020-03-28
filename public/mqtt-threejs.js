@@ -68,6 +68,15 @@ let yellow = new THREE.MeshLambertMaterial({
     color: 0xFFFF00
 });
 
+let testi = new THREE.MeshLambertMaterial({
+    color: 0x000000
+});
+
+
+
+
+
+
 let joints = [];
 const load_geometries = async () => {
     {
@@ -105,75 +114,57 @@ const load_geometries = async () => {
     }
 
 };
-
-
 let offsets = [];
-load_geometries().then(()=>{
-  // move parts to origin
-  joints[1].geometry.translate(0, -0.282, 0);
-  joints[2].geometry.translate(-0.312,-0.670, 0.117);
-
-  joints[3].geometry.translate(-0.26869,-1.74413, 0.19685);
-
-  joints[4].geometry.translate(-1315.19,-1.96913, 0.00015);
-  joints[5].geometry.translate(-1.54869,-1.96913, 0.08715);
- // joints[6].geometry.translate(-1.76369,-1.96913, 0.02047);
+load_geometries().then(() => {
 
 
-  //offset = 
+    // move parts to origin
+    joints[1].geometry.translate(0, -0.282, 0);
+    joints[2].geometry.translate(-0.312, -0.670, 0.117);
+    joints[3].geometry.translate(-0.26869, -1.74413, 0.19685);  // J3: [268.69, 1744.13, -196.85] Z
+    joints[4].geometry.translate(-1.31519, -1.96913, -0.00015); //J4: [1315.19, 1969.13, 0.15] X
+    joints[5].geometry.translate(-1.54869, -1.96913, -0.08715); //J5: [1548.69, 1969.13, 87.15] Z
+   // joints[6].geometry.translate(-1076369, -1.96913, -0.02047);// J6: [1763.69, 1969.13, 20.47] X
 
-   /* J1: [0, 282,0] Y
-    J2: [312, 670, -117] Z
-    
-    
-    J3: [268.69, 1744.13, -196.85] Z
-    J4: [1315.19, 1969.13, 0.15] X
-    J5: [1548.69, 1969.13, 87.15] Z
-    J6: [1763.69, 1969.13, 20.47] X */
-
-
-
-
-
-  
 
     scene.add(joints[0]);
-    joints[0].rotation.set(THREE.Math.degToRad(90),0,0);
+    joints[0].rotation.set(THREE.Math.degToRad(90), 0, 0);
 
-    offsets.push(new THREE.Group()); 
-    offsets[0].position.set(0, 0.282,0);
+    offsets.push(new THREE.Group());
+    offsets[0].position.set(0, 0.282, 0);
     joints[0].add(offsets[0]);
     offsets[0].add(joints[1]);
 
-    offsets.push(new THREE.Group()); 
-    offsets[1].position.set(0.312, 0.388,-0.117);  
+    offsets.push(new THREE.Group());
+    offsets[1].position.set(0.312, 0.388, -0.117);
     joints[1].add(offsets[1]);
     offsets[1].add(joints[2]);
 
-    offsets.push(new THREE.Group()); 
-    offsets[2].position.set(0.04331, 1.074413, -0.07985);  
+
+    //scene.add(joints[3]);
+    offsets.push(new THREE.Group());
+    offsets[2].position.set(-0.04331, 1.074413, -0.07985);
     joints[2].add(offsets[2]);
     offsets[2].add(joints[3]);
+ 
+ 
+    // offsets[0].position.set(0, 0.282, 0);
+    // J1: [0, 282,0] Y                        
+    // J2: [312, 670, -117] Z    offsets[1].position.set(0.312, 0.388, -0.117);
+    // J3: [268.69, 1744.13, -196.85] Z   offsets[2].position.set(-0.04331, 1.074413, -0.07985);
+    // J4: [1315.19, 1969.13, 0.15] X offsets[3].position.set(0.312, 0.6697, -.1169);   //KORJAA NÄMÄ ARVOT
+    // J5: [1548.69, 1969.13, 87.15] Z
+    // J6: [1763.69, 1969.13, 20.47] X
 
     offsets.push(new THREE.Group()); 
-    offsets[3].position.set(0.04331, 1.074413, -0.07985);  //KORJAA NÄMÄ ARVOT
+    offsets[3].position.set( (1315.19-268.69)/1000 ,(1969.13-1744.13)/1000, ((0.15)-(-196.85))/1000 ); 
     joints[3].add(offsets[3]);
     offsets[3].add(joints[4]);
 
     offsets.push(new THREE.Group()); 
-    offsets[4].position.set(0.04331, 1.074413, -0.07985);  //KORJAA NÄMÄ ARVOT
+    offsets[4].position.set( (1548.69-1315.19)/1000, (1969.13-1969.13)/1000, (87.15-0.15)/1000 );
     joints[4].add(offsets[4]);
     offsets[4].add(joints[5]);
-
-    /*     offsets.push(new THREE.Group()); 
-    offsets[3].position.set(0.04331, 1.074413, -0.07985);  //KORJAA NÄMÄ ARVOT
-    joints[3].add(offsets[5]);
-    offsets[3].add(joints[6]);
- */
-
-
-
-
 
 
     joints[3].rotation.set(0,0, THREE.Math.degToRad(45));
@@ -183,10 +174,6 @@ load_geometries().then(()=>{
 
     //joints[1].rotation.set(0,0, THREE.Math.degToRad(45));
 });
-
-
-
-
 
 
 const orbit_controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -218,13 +205,22 @@ mqtt_client.on('connect', () => {
 });
 
 
-mqtt_client.on('message', (topic,message ) => {
-    //if(joints.lenght==6){
-    const joint_data = JSON.parse(message);
-joints[1].rotation.set(0, THREE.Math.degToRad(joint_data.joints[0]),0);
-joints[2].rotation.set(0,0, THREE.Math.degToRad(joint_data.joints[1]));
-joints[3].rotation.set(0,0, THREE.Math.degToRad(joint_data.joints[2])  -THREE.Math.degToRad(joint_data.joints[1]));
-//}
+mqtt_client.on('message', (topic, message) => {
+    if (joints.length == 6) {
+        const joint_data = JSON.parse(message);
+        joints[1].rotation.set(0, THREE.Math.degToRad(joint_data.joints[0]), 0);
+        joints[2].rotation.set(0, 0, THREE.Math.degToRad(joint_data.joints[1]));
+        joints[3].rotation.set(0, 0, THREE.Math.degToRad(joint_data.joints[2]) - THREE.Math.degToRad(joint_data.joints[1]));
+        joints[4].rotation.set(  THREE.Math.degToRad(joint_data.joints[3]),0,0);
+        joints[5].rotation.set(0, 0, THREE.Math.degToRad(joint_data.joints[4]));
+
+
+
+
+
+
+
+    }
 });
 
 
